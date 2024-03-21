@@ -5,7 +5,6 @@ This Terraform module deploys a Resource Group, Virtual Network, Subnet, VM, Net
 For_each loop has been used in the every module.
 
 Example for calling the child module.
-
 # Resource-1: Azure Resource Group
 module "resource_group" {
   source          = "../module/resource-group"
