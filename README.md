@@ -91,7 +91,7 @@ module "nsg" {
 ```
 
 
-Example for passing the variables to create multiple resources which should be in tfvars file.
+# Example for passing the variables to create multiple resources which should be in tfvars file.
 
 ```
 #Stage
