@@ -1,6 +1,8 @@
 # Terraform-Modules
 
-This Terraform module deploys a Resource Group, Virtual Network, Subnet, VM, Network Security Group, Database, Storage Account, Container, Load Balancer in Azure. Calling the child module once and build multiple resources by passing the map of variables.
+Terraform modules are reusable, self-contained units of infrastructure configuration that encapsulate and abstract away specific pieces of infrastructure or functionality. They enable users to package infrastructure configurations into modular components, promoting consistency, reusability, and maintainability across projects.
+
+With Terraform modules, infrastructure configurations can be organized into smaller, manageable units, similar to building blocks. These modules can represent anything from simple resources like a virtual machine or a network subnet to complex multi-tier architectures.
 
 For_each loop has been used in the every module.
 
