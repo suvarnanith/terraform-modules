@@ -19,3 +19,9 @@ variable "environment" {
     type = string
     description = "The environment in which the resources will be created"
 }
+
+variable "key_vault_rg" {
+    type = string
+    description = "The name of the resource group in which the resources will be created"
+  
+}

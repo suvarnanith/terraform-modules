@@ -9,7 +9,7 @@ variable "environment" {
     description = "The environment in which the resources will be created"
 }
 
-variable "key_vault_name" {
+variable "key_vault_name_cred" {
     type = string
     description = "value of the keyvault"
 }

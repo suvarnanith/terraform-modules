@@ -51,7 +51,7 @@ variable "availability_set" {
     }))
   
 }
-variable "key_vault_name" {
+variable "key_vault_name_cred" {
     type = string
     description = "value of the keyvault"
 }

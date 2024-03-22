@@ -3,7 +3,7 @@ data "azurerm_resource_group" "lb-rg" {
 }
 
 data "azurerm_key_vault" "keyvault" {
-    name = var.key_vault_name
+    name = var.key_vault_name_cred
     resource_group_name = data.azurerm_resource_group.lb-rg.name
 }
 
