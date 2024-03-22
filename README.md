@@ -25,14 +25,20 @@ module "storage_account_module" {
   depends_on = [ module.resource_group, module.virtual_network ]
 
 }
-#Azure Storage Container
-module "container_module" {
-  source = "../module/Storage-Container"
-  containers = var.containers
-  depends_on = [ module.storage_account_module ]
+
+ module "container_module" {
+    source = "../module/Storage-Container"
+    containers = var.containers
+    depends_on = [ module.storage_account_module ]
   
 }
-#Azure Vnet and Subnet
+
+module "fileshare_module" {
+  source = "../module/Storage-Fileshare"
+  fileshare = var.fileshare
+  depends_on = [ module.storage_account_module ]
+}
+
 module "virtual_network" {
   source = "../module/virtual-network-subnet"
   vnets = var.vnets
@@ -41,19 +47,17 @@ module "virtual_network" {
   depends_on = [ module.resource_group ]
 }
 
-#Azure VM
 module "virtual_machine" {
   source = "../module/azure-vm"
   vms = var.vms
   environment = var.environment
-  key_vault_name = var.key_vault_name
-  key_vault_rg = var.key_vault_rg
+  key_vault_name_cred = var.key_vault_name_cred
+  resource_group_name_kv = var.resource_group_name_kv
   nics = var.nics
   availability_set = var.availability_set
-  depends_on = [ module.virtual_network ]
+  depends_on = [ module.virtual_network, module.key-vault ]
 }
 
-#Azure Load balancer
 module "load-balancer" {
   source = "../module/load-balancer"
   load_balancers = var.load_balancers
@@ -62,23 +66,21 @@ module "load-balancer" {
   depends_on = [ module.virtual_machine ]
 }
 
-#Azure Database
 module "database" {
   source = "../module/database"
   database = var.database
   server = var.server
   environment = var.environment
   resource_group_name_db = var.resource_group_name_db
-  key_vault_name = var.key_vault_name
+  key_vault_name_cred = var.key_vault_name_cred
   depends_on = [ module.resource_group, module.key-vault ]
 }
 
-#Azure Key vault
 module "key-vault" {
   source = "../module/key-vault"
   key_vault = var.key_vault
   environment = var.environment
-  resource_group_name_db = var.resource_group_name_db
+  resource_group_name_kv = var.resource_group_name_kv
   depends_on = [ module.resource_group ]
 }
 
@@ -87,8 +89,10 @@ module "nsg" {
   resource_group_name_nsg = var.resource_group_name_nsg
   nsgname = var.nsgname
   custom_rules = var.custom_rules
+  nsg_virtual_network_name = var.nsg_virtual_network_name
+  nsg_subnet = var.nsg_subnet
   environment = var.environment
-  
+  depends_on = [ module.resource_group,module.virtual_network ]
 }
 ```
 
@@ -96,23 +100,14 @@ module "nsg" {
 # Example for passing the variables to create multiple resources which should be in tfvars file.
 
 ```
-#Stage
-environment = "dev"
-
-#Resource Group
 resource_groups = {
   rg1 = {
     name     = "rg1"
     location = "westus"
   }
-  rg2 = {
-    name     = "rg2"
-    location = "eastus"
-  }
 }
+environment = "dev"
 
-
-#Storage Variable
 storage_account = {
   storage1 = {
     name                = "nistore1"
@@ -127,35 +122,7 @@ storage_account = {
     service_vnet_name = "subnet1"
     service_subnet_name = "vnet1"
   }
-  storage2 = {
-    name                = "nistore2"
-    resource_group_name = "rg2"
-    location            = "eastus"
-    account_tier        = "Standard"
-    account_replication_type = "GRS"
-    min_tls_version     = "TLS1_2"
-    access_tier         = "Hot"
-    account_kind        = "StorageV2"
-    is_hns_enabled      = true
-    service_vnet_name = "subnet1"
-    service_subnet_name = "vnet1"
-  }
 }
-
-network_rules = {
-  subnet_ids1 = {
-    vnet_name = "vnet1"
-    resource_group_name  = "rg1"
-    subnet_name = "subnet1"
-  },
-  subnet_ids2 = {
-    vnet_name = "vnet1"
-    resource_group_name  = "rg1"
-    subnet_name = "subnet2"
-  }
-}
-
-#container Variable
 
 containers = {
   container1 = {
@@ -164,15 +131,16 @@ containers = {
     resource_group_name   = "rg1"
     container_access_type = "private"
   }
-  container2 = {
-    name                  = "container2"
-    storage_account_name  = "nistore2"
-    resource_group_name   = "rg2"
-    container_access_type = "private"
-  }
 }
 
-#Vnet and subnet Variable
+fileshare = {
+  fileshare1 = {
+    name                  = "file1"
+    storage_account_name  = "nistore1"
+    resource_group_name   = "rg1"
+    quota = 1
+  }
+}
 vnets = {
   vnet1 = {
     address_space = "10.0.0.0/16"
@@ -209,7 +177,18 @@ vnets = {
 }
 resource_group_name_vnet = "rg1"
 
-#VM, Network Interface and Availability Set Variable
+network_rules = {
+  subnet_ids1 = {
+    vnet_name = "vnet1"
+    resource_group_name  = "rg1"
+    subnet_name = "subnet1"
+  },
+  subnet_ids2 = {
+    vnet_name = "vnet1"
+    resource_group_name  = "rg1"
+    subnet_name = "subnet2"
+  }
+}
 
 nics = {
   nic1 = {
@@ -221,20 +200,6 @@ nics = {
   }
   nic2 = {
     name = "nic2"
-    location = "westus"
-    resource_group_name = "rg1"
-    subnet_name = "subnet1"
-    virtual_network_name = "vnet1"
-  }
-  nic3 = {
-    name = "nic3"
-    location = "westus"
-    resource_group_name = "rg1"
-    subnet_name = "subnet2"
-    virtual_network_name = "vnet1"
-  }
-  nic4 = {
-    name = "nic4"
     location = "westus"
     resource_group_name = "rg1"
     subnet_name = "subnet2"
@@ -275,7 +240,7 @@ vms = {
     resource_group_name = "rg1"
     vm_size             = "Standard_DS1_v2"
     nicname             = "nic2"
-    avsetname           = "avset1"
+    avsetname           = "avset2"
     os_disk = {
       caching          = "ReadWrite"
       managed_disk_type = "Standard_LRS"
@@ -289,58 +254,6 @@ vms = {
     }
     os_profile = {
       computer_name  = "vm2"
-      admin_username = "adminuser"
-    }
-    linux_config = {
-      disable_password_authentication = false
-    }
-  }
-  vm3 = {
-    name                = "vm3"
-    location            = "westus"
-    resource_group_name = "rg1"
-    vm_size             = "Standard_DS1_v2"
-    nicname             = "nic3"
-    avsetname           = "avset2"
-    os_disk = {
-      caching          = "ReadWrite"
-      managed_disk_type = "Standard_LRS"
-      create_option    = "FromImage"
-    }
-    image_reference = {
-      publisher = "Canonical"
-      offer     = "UbuntuServer"
-      sku       = "16.04.0-LTS"
-      version   = "latest"
-    }
-    os_profile = {
-      computer_name  = "vm3"
-      admin_username = "adminuser"
-    }
-    linux_config = {
-      disable_password_authentication = false
-    }
-  }
-  vm4 = {
-    name                = "vm4"
-    location            = "westus"
-    resource_group_name = "rg1"
-    vm_size             = "Standard_DS1_v2"
-    nicname             = "nic4"
-    avsetname           = "avset2"
-    os_disk = {
-      caching          = "ReadWrite"
-      managed_disk_type = "Standard_LRS"
-      create_option    = "FromImage"
-    }
-    image_reference = {
-      publisher = "Canonical"
-      offer     = "UbuntuServer"
-      sku       = "16.04.0-LTS"
-      version   = "latest"
-    }
-    os_profile = {
-      computer_name  = "vm4"
       admin_username = "adminuser"
     }
     linux_config = {
@@ -362,8 +275,6 @@ availability_set = {
 
 }
 
-#load Balancer
-
 load_balancers = {
   "lb1" = {
     name                = "lb1"
@@ -381,8 +292,6 @@ load_balancers = {
   }
 }
 resource_group_name_lb = "rg1"
-
-#DB
 resource_group_name_db = "rg1"
 
 server = {
@@ -403,15 +312,12 @@ database = {
     zone_redundant = false
   }
 }
-
-#key Vault
-
-key_vault_name_cred = "keyvault1"
+key_vault_name_cred = "nithvault2"
 resource_group_name_kv = "rg1"
 
 key_vault = {
   "key_vault1" = {
-    name                = "keyvault1"
+    name                = "nithvault2"
     sku_name            = "standard"
     soft_delete_retention_days = 7
     purge_protection_enabled = true
@@ -420,20 +326,13 @@ key_vault = {
   }
 }
 
-#NSG
-
-
 nsgname = "nsg1"
-nsg_subnet = "subnet1"
-nsg_virtual_network_name = "vnet1"
-resource_group_name_nsg = "rg1"
 
 custom_rules = [
     {
       name                   = "myssh"
       priority               = 201
       direction              = "Inbound"
-      nsgname                = "nsg1"
       access                 = "Allow"
       protocol               = "Tcp"
       source_port_range      = "*"
@@ -445,7 +344,6 @@ custom_rules = [
       name                    = "myhttp"
       priority                = 200
       direction               = "Inbound"
-      nsgname                 = "nsg2"
       access                  = "Allow"
       protocol                = "Tcp"
       source_port_range       = "*"
@@ -454,6 +352,11 @@ custom_rules = [
       description             = "description-http"
     },
   ]
+
+  resource_group_name_nsg = "rg1"
+  nsg_subnet = "subnet1"
+  nsg_virtual_network_name = "vnet1"
+  
 ```
 # Output.tf
 
