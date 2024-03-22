@@ -18,3 +18,11 @@ variable "environment" {
     description = "The environment in which the resources will be created"
   
 }
+variable "nsg_subnet" {
+  type = string
+  description = "The subnet to which the NSG will be associated"
+}
+variable "nsg_virtual_network_name" {
+  type = string
+  description = "The subnet to which the NSG will be associated"
+}

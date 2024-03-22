@@ -36,10 +36,11 @@ module "nsg" {
 # tfvars
 ```
 
-Variable "nsgname" {
-  type = string
-  description = "NSG name"
-}
+
+nsgname = "nsg1"
+nsg_subnet = "subnet1"
+nsg_virtual_network_name = "vnet1"
+resource_group_name_nsg = "rg1"
 
 custom_rules = [
     {

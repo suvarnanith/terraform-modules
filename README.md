@@ -406,8 +406,8 @@ database = {
 
 #key Vault
 
-key_vault_name = "keyvault1"
-key_vault_rg = "rg1"
+key_vault_name_cred = "keyvault1"
+resource_group_name_kv = "rg1"
 
 key_vault = {
   "key_vault1" = {
@@ -422,11 +422,11 @@ key_vault = {
 
 #NSG
 
-Variable "nsgname" {
-  type = string
-  description = "NSG name"
-}
 
+nsgname = "nsg1"
+nsg_subnet = "subnet1"
+nsg_virtual_network_name = "vnet1"
+resource_group_name_nsg = "rg1"
 
 custom_rules = [
     {

@@ -45,7 +45,8 @@ key_vault = {
     
   }
 }
-key_vault_rg = "rg1"
+key_vault_name_cred = "nithvault2"
+resource_group_name_kv = "rg1"
 
 ```
 

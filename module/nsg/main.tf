@@ -1,7 +1,11 @@
 data "azurerm_resource_group" "nsg"{
     name = var.resource_group_name_nsg
 }
-
+data "azurerm_subnet" "nsg_subnet" {
+    name = var.nsg_subnet
+    virtual_network_name = var.nsg_virtual_network_name
+    resource_group_name = data.azurerm_resource_group.nsg.name
+}
 resource "azurerm_network_security_group" "nsg" {
     resource_group_name = data.azurerm_resource_group.nsg.name
     location = data.azurerm_resource_group.nsg.location
@@ -34,4 +38,9 @@ resource "azurerm_network_security_rule" "custom_rules" {
   source_application_security_group_ids      = lookup(each.value, "source_application_security_group_ids", null)
   source_port_range                          = lookup(each.value, "source_port_range", "*") == "*" ? "*" : null
   source_port_ranges                         = lookup(each.value, "source_port_range", "*") == "*" ? null : [for r in split(",", each.value.source_port_range) : trimspace(r)]
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsgassociation" {
+  subnet_id                 = data.azurerm_subnet.nsg_subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }
