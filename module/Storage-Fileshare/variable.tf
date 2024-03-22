@@ -1,15 +1,9 @@
 variable "fileshare"{
-    type = any
-    default = []
+    type = map(object({
+        name = string
+        storage_account_name = string
+        resource_group_name = string
+        quota = number
+    }))
     description = "The fileshare to be created in the storage account"
-}
-
-variable "storage_account_name" {
-    type = string
-    description = "The storage account to be created"
-}
-
-variable "resource_group_name" {
-    type = string
-    description = "The storage account to be created"
 }

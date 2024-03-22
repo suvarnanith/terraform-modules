@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 data "azurerm_resource_group" "kv-rg" {
-  name = var.key_vault_rg
+  name = var.resource_group_name_kv
 }
 
 resource "azurerm_key_vault" "key-vault" {

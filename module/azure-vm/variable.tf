@@ -55,7 +55,7 @@ variable "key_vault_name_cred" {
     type = string
     description = "value of the keyvault"
 }
-variable "key_vault_rg" {
+variable "resource_group_name_kv" {
     type = string
     description = "value of the keyvault"
 }

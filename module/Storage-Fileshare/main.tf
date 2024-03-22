@@ -6,7 +6,7 @@ data "azurerm_storage_account" "storage_account" {
 
 resource "azurerm_storage_share" "fileshare" {
   for_each             = var.fileshare
-  name                 = each.value.filesharename
+  name                 = each.value.name
   storage_account_name = data.azurerm_storage_account.storage_account[each.key].name
   quota                = each.value.quota
 }

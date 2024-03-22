@@ -12,7 +12,7 @@ data "azurerm_resource_group" "rg" {
 
 data "azurerm_key_vault" "keyvault" {
     name = var.key_vault_name_cred
-    resource_group_name = var.key_vault_rg
+    resource_group_name = var.resource_group_name_kv
 }
 
 resource "random_password" "password" {

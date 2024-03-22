@@ -24,7 +24,7 @@ resource "azurerm_network_security_rule" "custom_rules" {
   access                                     = lookup(each.value, "access", "Allow")
   direction                                  = lookup(each.value, "direction", "Inbound")
   name                                       = lookup(each.value, "name", "default_rule_name")
-  network_security_group_name                = each.value.nsgname
+  network_security_group_name                = azurerm_network_security_group.nsg.name
   priority                                   = each.value.priority
   protocol                                   = lookup(each.value, "protocol", "*")
   resource_group_name                        = data.azurerm_resource_group.nsg.name

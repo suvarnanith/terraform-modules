@@ -190,6 +190,7 @@ availability_set = {
 
 }
 key_vault_name_cred = "keyvault1"
+resource_group_name_kv = "rg1"
 
 ```
 
