@@ -422,14 +422,11 @@ key_vault = {
 
 #NSG
 
-network_security_group = {
-  "1" = {
-    name = "nsg1"
-  }
-  "2" = {
-    name = "nsg2"
-  }
+Variable "nsgname" {
+  type = string
+  description = "NSG name"
 }
+
 
 custom_rules = [
     {
